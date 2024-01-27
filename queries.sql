@@ -33,3 +33,19 @@ having floor(avg(p.price * s.quantity)) < (
 	from sales s inner join products p on s.product_id = p.product_id 
 )
 order by average_income;
+
+
+-- Запрос для демонстрации средней выручки по дням недели в зависимости от продавца
+-- Складывает имя и фамилию в единое поле таблицы, извлекает из даты совершения продажи день недели, через группировку считает для каждой
+-- пары значений таких полей округленную в меньшую сторону сумму выручки с продаж. Для сортировки с понедельника по воскресенье добавлена мнимая группировка
+-- для упорядочивания элементов: вычисляет день недели в виде цифры, преобразует тип данных в целочисленный, прибавляет 5 и 
+-- находит остаток результата от деления на 7
+select
+	concat(e.first_name, ' ', e.last_name) as name,
+	to_char(s.sale_date, 'day') as weekday,
+	floor(sum(p.price * s.quantity)) as income
+from employees e
+inner join sales s on s.sales_person_id = e.employee_id 
+inner join products p on p.product_id = s.product_id 
+group by concat(e.first_name, ' ', e.last_name), to_char(s.sale_date, 'day'), mod(cast(to_char(s.sale_date, 'd') as integer) + 5, 7)
+order by mod(cast(to_char(s.sale_date, 'd') as integer) + 5, 7), name;
