@@ -73,3 +73,27 @@ from sales s
 inner join products p on s.product_id = p.product_id
 group by to_char(s.sale_date, 'yyyy-mm')
 order by date;
+
+
+-- CTE: Подзапрос выбирает акционные товары. Запрос добавляет нумерацию по партиции customer_id, сортированную по дате
+-- Основной запрос: формирует строки с именами продавцов, покупателей и дат для тех строк, чей номер по нумерации - 1
+-- (первая покупка акционного товара)
+with subquery as (select 
+	customer_id,
+	product_id,
+	sales_person_id,
+	sale_date,
+	row_number() over(partition by customer_id order by sale_date) as number
+from sales s
+where product_id in (select product_id
+	from products
+	where price = 0)
+order by customer_id, sale_date, number)
+select 
+	concat(c.first_name, ' ', c.last_name) as customer,
+	sq.sale_date as sale_date,
+	concat(e.first_name, ' ', e.last_name) as seller
+from subquery sq
+inner join customers c on sq.customer_id = c.customer_id
+inner join employees e on e.employee_id = sq.sales_person_id
+where number = 1;
