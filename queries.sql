@@ -62,3 +62,14 @@ end as age_category
 from customers) as subquery
 group by age_category
 order by age_category;
+
+
+-- Запрос группирует строки по доте в нужном формате и агрегирует данные по количеству покупателей и округленной сумме.
+select 
+	to_char(s.sale_date, 'yyyy-mm') as date,
+	count(distinct s.customer_id) as total_customers,
+	floor(sum(s.quantity * p.price)) as income
+from sales s
+inner join products p on s.product_id = p.product_id
+group by to_char(s.sale_date, 'yyyy-mm')
+order by date;
