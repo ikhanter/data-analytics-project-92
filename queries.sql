@@ -42,12 +42,12 @@ order by average_income;
 -- находит остаток результата от деления на 7.
 select
 	concat(e.first_name, ' ', e.last_name) as name,
-	to_char(s.sale_date, 'day') as weekday,
+	trim(to_char(s.sale_date, 'day')) as weekday,
 	floor(sum(p.price * s.quantity)) as income
 from employees e
 inner join sales s on s.sales_person_id = e.employee_id 
 inner join products p on p.product_id = s.product_id 
-group by concat(e.first_name, ' ', e.last_name), to_char(s.sale_date, 'day'), mod(cast(to_char(s.sale_date, 'd') as integer) + 5, 7)
+group by concat(e.first_name, ' ', e.last_name), trim(to_char(s.sale_date, 'day')), mod(cast(to_char(s.sale_date, 'd') as integer) + 5, 7)
 order by mod(cast(to_char(s.sale_date, 'd') as integer) + 5, 7), name;
 
 
