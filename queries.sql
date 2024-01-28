@@ -23,12 +23,12 @@ limit 10;
 -- средней выручки.
 select
 	concat(e.first_name, ' ', e.last_name) as name,
-	floor(avg(p.price * s.quantity)) as average_income
+	round(avg(p.price * s.quantity), 0) as average_income
 from employees e
 inner join sales s on s.sales_person_id = e.employee_id 
 inner join products p on p.product_id = s.product_id 
 group by concat(e.first_name, ' ', e.last_name)
-having floor(avg(p.price * s.quantity)) < (
+having round(avg(p.price * s.quantity), 0) < (
 	select avg(p.price * s.quantity)
 	from sales s inner join products p on s.product_id = p.product_id 
 )
@@ -43,7 +43,7 @@ order by average_income;
 select
 	concat(e.first_name, ' ', e.last_name) as name,
 	trim(to_char(s.sale_date, 'day')) as weekday,
-	floor(sum(p.price * s.quantity)) as income
+	round(sum(p.price * s.quantity), 0) as income
 from employees e
 inner join sales s on s.sales_person_id = e.employee_id 
 inner join products p on p.product_id = s.product_id 
